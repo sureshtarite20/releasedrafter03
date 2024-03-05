@@ -1,0 +1,34 @@
+name: Release Publisher
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: git config --local user.name $(git log -1 --pretty=format:'%an')
+
+      - run: git config --local user.email $(git log -1 --pretty=format:'%ae')
+
+      - run: git switch release
+
+      - run: git checkout -B release-${{ github.event.release.tag_name }}
+
+      - run: git merge ${{ github.event.release.tag_name }}
+
+      - run: git push -u origin release-${{ github.event.release.tag_name }}
+
+      - run: gh pr create --base release --title "$PR_TITLE" --body "$PR_BODY" --draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: Release ${{ github.event.release.name }}
+          PR_BODY: ${{ github.event.release.body }}

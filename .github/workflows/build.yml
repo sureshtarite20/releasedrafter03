@@ -1,0 +1,12 @@
+name: 'Reusable Workflow: Build'
+
+on:
+  workflow_call:
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build, test, and publish steps go here

@@ -1,0 +1,16 @@
+name: 'Deployment: Staging env'
+
+on:
+  pull_request:
+    branches: [release]
+    types: [ready_for_review, synchronize, opened, reopened]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  staging:
+    needs: build
+    uses: ./.github/workflows/deploy.yml
+    with:
+      github-environment: Staging
